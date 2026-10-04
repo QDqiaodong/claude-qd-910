@@ -15,6 +15,8 @@ CREATE DATABASE IF NOT EXISTS shipyard_dock
 USE shipyard_dock;
 
 SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS launch_clearance_check;
+DROP TABLE IF EXISTS launch_clearance;
 DROP TABLE IF EXISTS punch_item;
 DROP TABLE IF EXISTS survey;
 DROP TABLE IF EXISTS lift;
@@ -223,6 +225,62 @@ CREATE TABLE punch_item (
     status VARCHAR(16),
     closed_at DATETIME,
     created_at DATETIME
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ---------------- 下水放行单 ----------------
+-- 状态流转：PENDING 待确认 → CONFIRMED 已放行 / VOID 已作废
+-- snapshot_json / blockers_json 是生成时的关键快照，落库后不再改写；
+-- 后续整改的每一次复核都追加到 launch_clearance_check，旧证据不被新数据覆盖。
+CREATE TABLE launch_clearance (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    clearance_no VARCHAR(24) NOT NULL UNIQUE,
+    vessel_id BIGINT NOT NULL,
+    vessel_no VARCHAR(24),
+    vessel_name VARCHAR(48),
+    berth_id BIGINT,
+    berth_no VARCHAR(16),
+    berth_name VARCHAR(48),
+    contract_id BIGINT,
+    contract_no VARCHAR(24),
+    contract_status VARCHAR(16),
+    status VARCHAR(16) NOT NULL,
+    verdict VARCHAR(16) NOT NULL,
+    latest_verdict VARCHAR(16),
+    latest_checked_at DATETIME,
+    block_count INT,
+    erected_count INT,
+    survey_valid_count INT,
+    critical_open_count INT,
+    punch_open_count INT,
+    snapshot_json TEXT,
+    blockers_json TEXT,
+    previous_no VARCHAR(24),
+    signed_by VARCHAR(32),
+    signed_at DATETIME,
+    generated_by VARCHAR(32),
+    generated_at DATETIME,
+    confirmed_by VARCHAR(32),
+    confirmed_at DATETIME,
+    voided_by VARCHAR(32),
+    voided_at DATETIME,
+    void_reason VARCHAR(128),
+    version INT NOT NULL DEFAULT 0,
+    created_at DATETIME
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ---------------- 放行单复核 / 操作记录 ----------------
+-- check_type：GENERATE 生成 / RECHECK 复核 / SIGN 签认 / CONFIRM 确认放行 / VOID 作废
+CREATE TABLE launch_clearance_check (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    clearance_id BIGINT NOT NULL,
+    check_type VARCHAR(16) NOT NULL,
+    verdict VARCHAR(16),
+    blockers_json TEXT,
+    summary_json TEXT,
+    operator VARCHAR(32),
+    note VARCHAR(255),
+    created_at DATETIME,
+    KEY idx_clearance_check (clearance_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- =====================================================================

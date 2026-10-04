@@ -11,6 +11,7 @@ const emit = defineEmits(['openTab'])
 
 const board = ref({ vessels: [], owners: [], contracts: [], typeMeta: [], types: [] })
 const detail = ref(null)
+const clearances = ref([])
 const loading = ref(false)
 const dialog = ref(false)
 
@@ -79,6 +80,19 @@ function openBlock(code, id) {
   emit('openTab', { path: '/block', title: code, params: { blockId: id } })
 }
 
+function openClearance(row) {
+  emit('openTab', {
+    path: '/launch',
+    title: '放行单 ' + row.clearanceNo,
+    sub: row.vesselName,
+    params: { clearanceId: row.id }
+  })
+}
+
+function openLaunchBoard() {
+  emit('openTab', { path: '/launch', title: '下水放行', params: {} })
+}
+
 async function advanceContract(contract) {
   loading.value = true
   try {
@@ -114,8 +128,12 @@ async function loadDetail() {
   detail.value = vesselId.value ? await api.vessel.detail(vesselId.value) : null
 }
 
+async function loadClearances() {
+  clearances.value = vesselId.value ? await api.launch.ofVessel(vesselId.value) : []
+}
+
 async function reload() {
-  await Promise.all([loadBoard(), loadDetail()])
+  await Promise.all([loadBoard(), loadDetail(), loadClearances()])
 }
 
 async function load() {
@@ -132,8 +150,10 @@ async function load() {
 watch(vesselId, () => {
   if (vesselId.value) {
     loadDetail().catch((e) => ElMessage.error(e.message))
+    loadClearances().catch((e) => ElMessage.error(e.message))
   } else {
     detail.value = null
+    clearances.value = []
   }
 })
 
@@ -200,6 +220,40 @@ onMounted(load)
           <el-table-column prop="statusName" label="状态" width="90" />
         </el-table>
         <div class="empty-tip" v-else>还没有分段</div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-title">
+          下水放行
+          <span class="view-tip">放行单全程留痕；确认后船舶置为已下水、占用船台同步释放</span>
+          <el-button size="small" type="primary" plain style="margin-left:auto" @click="openLaunchBoard">前往放行台</el-button>
+        </div>
+        <el-table :data="clearances" size="small" v-if="clearances.length">
+          <el-table-column label="单号" width="160">
+            <template #default="{ row }">
+              <span class="link" @click="openClearance(row)">{{ row.clearanceNo }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="状态" width="90">
+            <template #default="{ row }">{{ row.statusName }}</template>
+          </el-table-column>
+          <el-table-column label="生成结论" width="90">
+            <template #default="{ row }">{{ row.verdictName }}</template>
+          </el-table-column>
+          <el-table-column label="签认" width="110">
+            <template #default="{ row }">{{ row.signedBy || '未签认' }}</template>
+          </el-table-column>
+          <el-table-column label="确认放行" width="200">
+            <template #default="{ row }">
+              <span v-if="row.status === 'CONFIRMED'">{{ row.confirmedBy }} · {{ row.confirmedAt }}</span>
+              <span v-else>-</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="生成">
+            <template #default="{ row }">{{ row.generatedBy }} · {{ row.generatedAt }}</template>
+          </el-table-column>
+        </el-table>
+        <div class="empty-tip" v-else>还没有放行单，可前往放行台生成</div>
       </section>
     </div>
 

@@ -7,6 +7,7 @@ import BlockView from '../views/BlockView.vue'
 import ErectionView from '../views/ErectionView.vue'
 import SurveyView from '../views/SurveyView.vue'
 import VesselView from '../views/VesselView.vue'
+import LaunchView from '../views/LaunchView.vue'
 
 const routes = [
   { path: '/', redirect: '/overview' },
@@ -16,6 +17,7 @@ const routes = [
   { path: '/erection', name: 'erection', component: ErectionView },
   { path: '/survey', name: 'survey', component: SurveyView },
   { path: '/vessel', name: 'vessel', component: VesselView },
+  { path: '/launch', name: 'launch', component: LaunchView },
   { path: '/:pathMatch(.*)*', redirect: '/overview' }
 ]
 

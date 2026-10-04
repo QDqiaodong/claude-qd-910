@@ -1,6 +1,7 @@
 package com.shipyard.dock.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -16,6 +17,9 @@ public interface SurveyRepository extends JpaRepository<Survey, Long> {
     boolean existsBySurveyNo(String surveyNo);
 
     List<Survey> findByBlockIdOrderBySurveyDateDesc(Long blockId);
+
+    /** 分段当前有效的报验结论（最新一张报验单） */
+    Optional<Survey> findFirstByBlockIdOrderBySurveyDateDescIdDesc(Long blockId);
 
     List<Survey> findByVesselIdOrderBySurveyDateDesc(Long vesselId);
 

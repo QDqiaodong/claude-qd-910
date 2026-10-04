@@ -99,6 +99,22 @@ const survey = {
   removePunch: (id) => call(http.delete(`/survey/punch-items/${id}`))
 }
 
+const launch = {
+  board: () => call(http.get('/launch/board')),
+  list: () => call(http.get('/launch/list')),
+  ofVessel: (vesselId) => call(http.get(`/launch/vessel/${vesselId}`)),
+  detail: (id) => call(http.get(`/launch/${id}`)),
+  generate: (vesselId, operator) =>
+    call(http.post(`/launch/generate?vesselId=${vesselId}&operator=${encodeURIComponent(operator)}`)),
+  recheck: (id, operator) => call(http.post(`/launch/${id}/recheck?operator=${encodeURIComponent(operator)}`)),
+  sign: (id, operator) => call(http.post(`/launch/${id}/sign?operator=${encodeURIComponent(operator)}`)),
+  confirm: (id, operator) => call(http.post(`/launch/${id}/confirm?operator=${encodeURIComponent(operator)}`)),
+  void: (id, operator, reason) =>
+    call(http.post(`/launch/${id}/void?operator=${encodeURIComponent(operator)}&reason=${encodeURIComponent(reason || '')}`)),
+  regenerate: (id, operator, reason) =>
+    call(http.post(`/launch/${id}/regenerate?operator=${encodeURIComponent(operator)}&reason=${encodeURIComponent(reason || '')}`))
+}
+
 const stats = {
   overview: () => call(http.get('/stats/overview')),
   dict: () => call(http.get('/stats/dict')),
@@ -110,4 +126,4 @@ const stats = {
   vessel: () => call(http.get('/stats/vessel'))
 }
 
-export default { http, berth, vessel, block, erection, survey, stats }
+export default { http, berth, vessel, block, erection, survey, launch, stats }

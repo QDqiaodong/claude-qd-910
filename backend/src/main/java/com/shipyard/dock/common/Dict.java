@@ -189,6 +189,33 @@ public final class Dict {
             "RECTIFYING", List.of("CLOSED"),
             "CLOSED", List.of());
 
+    // ---------------- 下水放行单 ----------------
+    /** 待确认 → 已放行 / 已作废 */
+    public static final List<String> CLEARANCE_STATUSES = List.of("PENDING", "CONFIRMED", "VOID");
+
+    private static final Map<String, String> CLEARANCE_STATUS_NAME = Map.of(
+            "PENDING", "待确认",
+            "CONFIRMED", "已放行",
+            "VOID", "已作废");
+
+    /** 放行校验结论：READY 可放行 / BLOCKED 有阻塞 */
+    public static final List<String> CLEARANCE_VERDICTS = List.of("READY", "BLOCKED");
+
+    private static final Map<String, String> CLEARANCE_VERDICT_NAME = Map.of(
+            "READY", "可放行",
+            "BLOCKED", "有阻塞");
+
+    /** 放行单操作记录类型 */
+    public static final List<String> CLEARANCE_CHECK_TYPES = List.of(
+            "GENERATE", "RECHECK", "SIGN", "CONFIRM", "VOID");
+
+    private static final Map<String, String> CLEARANCE_CHECK_TYPE_NAME = Map.of(
+            "GENERATE", "生成放行单",
+            "RECHECK", "整改复核",
+            "SIGN", "质量签认",
+            "CONFIRM", "确认放行",
+            "VOID", "作废");
+
     // ---------------- 业务阈值 ----------------
     /** 单个分段重量上限（吨） */
     public static final BigDecimal MAX_BLOCK_WEIGHT = BigDecimal.valueOf(1200);
@@ -378,5 +405,21 @@ public final class Dict {
 
     public static boolean canTransferPunch(String from, String to) {
         return PUNCH_NEXT.getOrDefault(from, List.of()).contains(to);
+    }
+
+    public static boolean isValidClearanceStatus(String status) {
+        return status != null && CLEARANCE_STATUS_NAME.containsKey(status);
+    }
+
+    public static String clearanceStatusName(String status) {
+        return status == null ? "" : CLEARANCE_STATUS_NAME.getOrDefault(status, status);
+    }
+
+    public static String clearanceVerdictName(String verdict) {
+        return verdict == null ? "" : CLEARANCE_VERDICT_NAME.getOrDefault(verdict, verdict);
+    }
+
+    public static String clearanceCheckTypeName(String checkType) {
+        return checkType == null ? "" : CLEARANCE_CHECK_TYPE_NAME.getOrDefault(checkType, checkType);
     }
 }
