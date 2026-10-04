@@ -15,6 +15,7 @@ CREATE DATABASE IF NOT EXISTS shipyard_dock
 USE shipyard_dock;
 
 SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS launch_release;
 DROP TABLE IF EXISTS punch_item;
 DROP TABLE IF EXISTS survey;
 DROP TABLE IF EXISTS lift;
@@ -222,6 +223,43 @@ CREATE TABLE punch_item (
     owner VARCHAR(32),
     status VARCHAR(16),
     closed_at DATETIME,
+    created_at DATETIME
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ---------------- 下水放行单 ----------------
+-- 状态流转：OPEN 待确认 → CONFIRMED 已放行 / VOID 已作废（两个终态都留档）
+-- snapshot_json 是生成时的关键快照（船舶/船台/合同/分段/遗留项/阻塞明细），落库后不再改；
+-- last_check_json 是最近一次核验结果，与快照分开存放，旧结论不会被新数据覆盖。
+CREATE TABLE launch_release (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    release_no VARCHAR(24) NOT NULL UNIQUE,
+    vessel_id BIGINT NOT NULL,
+    vessel_no VARCHAR(24),
+    vessel_name VARCHAR(48),
+    berth_id BIGINT,
+    berth_no VARCHAR(16),
+    berth_name VARCHAR(48),
+    contract_id BIGINT,
+    contract_no VARCHAR(24),
+    status VARCHAR(16) NOT NULL,
+    verdict VARCHAR(16),
+    block_count INT,
+    erected_count INT,
+    survey_ok_count INT,
+    open_punch_count INT,
+    open_critical_count INT,
+    blocker_count INT,
+    snapshot_json TEXT,
+    last_check_at DATETIME,
+    last_check_json TEXT,
+    regenerated_from BIGINT,
+    generated_by VARCHAR(32),
+    generated_at DATETIME,
+    confirmed_by VARCHAR(32),
+    confirmed_at DATETIME,
+    voided_by VARCHAR(32),
+    voided_at DATETIME,
+    void_reason VARCHAR(128),
     created_at DATETIME
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

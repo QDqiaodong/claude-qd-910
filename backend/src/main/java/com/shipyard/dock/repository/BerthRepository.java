@@ -1,6 +1,7 @@
 package com.shipyard.dock.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -15,6 +16,9 @@ public interface BerthRepository extends JpaRepository<Berth, Long> {
     boolean existsByBerthNo(String berthNo);
 
     List<Berth> findByStatusOrderByIdAsc(String status);
+
+    /** 某条船当前占用的船台（在台船舶定位用） */
+    Optional<Berth> findFirstByVesselIdOrderByIdAsc(Long vesselId);
 
     /** 空闲可排船的船台 */
     @Query("select b from Berth b where b.status = 'IDLE' order by b.berthNo")

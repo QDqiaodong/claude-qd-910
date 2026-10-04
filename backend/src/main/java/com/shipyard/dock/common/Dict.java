@@ -189,6 +189,22 @@ public final class Dict {
             "RECTIFYING", List.of("CLOSED"),
             "CLOSED", List.of());
 
+    // ---------------- 下水放行单 ----------------
+    /** 待确认 → 已放行 / 已作废；已放行与已作废都是终态，单据传此留档 */
+    public static final List<String> RELEASE_STATUSES = List.of("OPEN", "CONFIRMED", "VOID");
+
+    private static final Map<String, String> RELEASE_STATUS_NAME = Map.of(
+            "OPEN", "待确认",
+            "CONFIRMED", "已放行",
+            "VOID", "已作废");
+
+    /** 生成时评估结论：可放行 / 有阻塞 */
+    public static final List<String> RELEASE_VERDICTS = List.of("READY", "BLOCKED");
+
+    private static final Map<String, String> RELEASE_VERDICT_NAME = Map.of(
+            "READY", "可放行",
+            "BLOCKED", "有阻塞");
+
     // ---------------- 业务阈值 ----------------
     /** 单个分段重量上限（吨） */
     public static final BigDecimal MAX_BLOCK_WEIGHT = BigDecimal.valueOf(1200);
@@ -378,5 +394,17 @@ public final class Dict {
 
     public static boolean canTransferPunch(String from, String to) {
         return PUNCH_NEXT.getOrDefault(from, List.of()).contains(to);
+    }
+
+    public static boolean isValidReleaseStatus(String status) {
+        return status != null && RELEASE_STATUS_NAME.containsKey(status);
+    }
+
+    public static String releaseStatusName(String status) {
+        return status == null ? "" : RELEASE_STATUS_NAME.getOrDefault(status, status);
+    }
+
+    public static String releaseVerdictName(String verdict) {
+        return verdict == null ? "" : RELEASE_VERDICT_NAME.getOrDefault(verdict, verdict);
     }
 }

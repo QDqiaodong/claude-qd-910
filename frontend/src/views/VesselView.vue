@@ -79,6 +79,20 @@ function openBlock(code, id) {
   emit('openTab', { path: '/block', title: code, params: { blockId: id } })
 }
 
+function fmtTime(time) {
+  return time ? String(time).replace('T', ' ').slice(0, 19) : '-'
+}
+
+/** 跳到下水放行台：带单号直接定位到那张放行单，不带则开放行台首页 */
+function openLaunch(release) {
+  emit('openTab', {
+    path: '/launch',
+    title: release ? '放行单 ' + release.releaseNo : '下水放行',
+    sub: release ? release.vesselNo + ' ' + release.vesselName : '',
+    params: release ? { releaseId: release.id } : {}
+  })
+}
+
 async function advanceContract(contract) {
   loading.value = true
   try {
@@ -200,6 +214,42 @@ onMounted(load)
           <el-table-column prop="statusName" label="状态" width="90" />
         </el-table>
         <div class="empty-tip" v-else>还没有分段</div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-title">
+          下水放行记录
+          <span class="view-tip">放行单与船台平面图、本页状态同源；点单号可追到阻塞明细与确认记录</span>
+          <el-button size="small" type="primary" plain style="margin-left:auto" @click="openLaunch()">前往放行台</el-button>
+        </div>
+        <el-table :data="detail.releases || []" size="small" v-if="(detail.releases || []).length">
+          <el-table-column label="单号" width="140">
+            <template #default="{ row }">
+              <span class="link" @click="openLaunch(row)">{{ row.releaseNo }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="状态" width="90" align="center">
+            <template #default="{ row }">
+              <el-tag size="small" :type="row.status === 'CONFIRMED' ? 'success' : row.status === 'VOID' ? 'info' : 'warning'">{{ row.statusName }}</el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column label="生成时结论" width="100" align="center">
+            <template #default="{ row }">
+              <el-tag size="small" :type="row.verdict === 'READY' ? 'success' : 'danger'" effect="light">{{ row.verdictName }}</el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column prop="berthNo" label="船台" width="80" />
+          <el-table-column label="生成" width="160">
+            <template #default="{ row }">{{ row.generatedBy }} · {{ fmtTime(row.generatedAt) }}</template>
+          </el-table-column>
+          <el-table-column label="确认放行" width="160">
+            <template #default="{ row }">
+              <span v-if="row.confirmedAt">{{ row.confirmedBy }} · {{ fmtTime(row.confirmedAt) }}</span>
+              <span v-else>-</span>
+            </template>
+          </el-table-column>
+        </el-table>
+        <div class="empty-tip" v-else>还没有放行单，可前往下水放行台生成</div>
       </section>
     </div>
 

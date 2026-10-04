@@ -21,6 +21,7 @@ import com.shipyard.dock.domain.Vessel;
 import com.shipyard.dock.dto.VesselRequest;
 import com.shipyard.dock.repository.BlockRepository;
 import com.shipyard.dock.repository.ContractRepository;
+import com.shipyard.dock.repository.LaunchReleaseRepository;
 import com.shipyard.dock.repository.OwnerRepository;
 import com.shipyard.dock.repository.VesselRepository;
 
@@ -36,13 +37,16 @@ public class VesselService {
     private final OwnerRepository ownerRepository;
     private final ContractRepository contractRepository;
     private final BlockRepository blockRepository;
+    private final LaunchReleaseRepository launchReleaseRepository;
 
     public VesselService(VesselRepository vesselRepository, OwnerRepository ownerRepository,
-            ContractRepository contractRepository, BlockRepository blockRepository) {
+            ContractRepository contractRepository, BlockRepository blockRepository,
+            LaunchReleaseRepository launchReleaseRepository) {
         this.vesselRepository = vesselRepository;
         this.ownerRepository = ownerRepository;
         this.contractRepository = contractRepository;
         this.blockRepository = blockRepository;
+        this.launchReleaseRepository = launchReleaseRepository;
     }
 
     public List<Vessel> list() {
@@ -144,13 +148,14 @@ public class VesselService {
         return data;
     }
 
-    /** 单船台账：船 + 合同 + 分段 */
+    /** 单船台账：船 + 合同 + 分段 + 下水放行记录 */
     public Map<String, Object> detail(Long id) {
         Vessel vessel = get(id);
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("vessel", vessel);
         data.put("contracts", contractRepository.findByVesselIdOrderByIdAsc(id));
         data.put("blocks", blockRepository.findByVesselIdOrderBySegSeqAsc(id));
+        data.put("releases", launchReleaseRepository.findByVesselIdOrderByIdDesc(id));
         return data;
     }
 

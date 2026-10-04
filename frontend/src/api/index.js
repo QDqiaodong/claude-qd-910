@@ -110,4 +110,15 @@ const stats = {
   vessel: () => call(http.get('/stats/vessel'))
 }
 
-export default { http, berth, vessel, block, erection, survey, stats }
+const launch = {
+  board: () => call(http.get('/launch/board')),
+  releases: () => call(http.get('/launch/releases')),
+  detail: (id) => call(http.get(`/launch/releases/${id}`)),
+  generate: (data) => call(http.post('/launch/releases', data)),
+  check: (id) => call(http.post(`/launch/releases/${id}/check`)),
+  confirm: (id, data) => call(http.post(`/launch/releases/${id}/confirm`, data)),
+  voidRelease: (id, data) => call(http.post(`/launch/releases/${id}/void`, data)),
+  reopen: (id, data) => call(http.post(`/launch/releases/${id}/reopen`, data))
+}
+
+export default { http, berth, vessel, block, erection, survey, stats, launch }

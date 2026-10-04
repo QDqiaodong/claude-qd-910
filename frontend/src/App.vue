@@ -6,6 +6,7 @@ import api from './api'
 import BerthView from './views/BerthView.vue'
 import BlockView from './views/BlockView.vue'
 import ErectionView from './views/ErectionView.vue'
+import LaunchView from './views/LaunchView.vue'
 import SurveyView from './views/SurveyView.vue'
 import VesselView from './views/VesselView.vue'
 
@@ -20,6 +21,7 @@ const viewMap = {
   '/berth': BerthView,
   '/block': BlockView,
   '/erection': ErectionView,
+  '/launch': LaunchView,
   '/survey': SurveyView,
   '/vessel': VesselView
 }
@@ -28,6 +30,7 @@ const titleMap = {
   '/berth': '船台船坞',
   '/block': '分段',
   '/erection': '搭载吊装',
+  '/launch': '下水放行',
   '/survey': '报验遗留',
   '/vessel': '船舶合同'
 }
@@ -49,7 +52,8 @@ const modules = [
   { path: '/block', title: '分段', desc: '卡片墙 + 状态徽章 · 点卡开分页', tip: '预制→涂装→搭载→合拢→交验' },
   { path: '/erection', title: '搭载吊装', desc: '吊装时间戳序列 + 吊次借记卡', tip: '超额定起重量拦截' },
   { path: '/survey', title: '报验遗留', desc: '左右双栏对照 · 判定印章', tip: '不合格必开遗留项' },
-  { path: '/vessel', title: '船舶合同', desc: '时间轴 + 合同信息卡', tip: '结算需报验通过' }
+  { path: '/vessel', title: '船舶合同', desc: '时间轴 + 合同信息卡', tip: '结算需报验通过' },
+  { path: '/launch', title: '下水放行', desc: '放行单快照 + 阻塞明细 · 确认即下水', tip: '分段交验 · 严重遗留闭环 · 合同非草拟' }
 ]
 
 function viewOf(tab) {
@@ -159,7 +163,7 @@ onMounted(() => {
       <div class="brand-mark">船</div>
       <div>
         <div class="brand-title">船舶修造船厂 · 船台船坞与分段管理</div>
-        <div class="brand-sub">船台船坞 · 船舶合同 · 分段 · 搭载吊装 · 报验与遗留项</div>
+        <div class="brand-sub">船台船坞 · 船舶合同 · 分段 · 搭载吊装 · 报验与遗留项 · 下水放行</div>
       </div>
       <div class="top-stats" v-if="overview">
         <div class="top-stat"><b>{{ overview.berthOccupied }}/{{ overview.berthCount }}</b><span>船台占用</span></div>

@@ -5,6 +5,7 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 import BerthView from '../views/BerthView.vue'
 import BlockView from '../views/BlockView.vue'
 import ErectionView from '../views/ErectionView.vue'
+import LaunchView from '../views/LaunchView.vue'
 import SurveyView from '../views/SurveyView.vue'
 import VesselView from '../views/VesselView.vue'
 
@@ -14,6 +15,7 @@ const routes = [
   { path: '/berth', name: 'berth', component: BerthView },
   { path: '/block', name: 'block', component: BlockView },
   { path: '/erection', name: 'erection', component: ErectionView },
+  { path: '/launch', name: 'launch', component: LaunchView },
   { path: '/survey', name: 'survey', component: SurveyView },
   { path: '/vessel', name: 'vessel', component: VesselView },
   { path: '/:pathMatch(.*)*', redirect: '/overview' }
